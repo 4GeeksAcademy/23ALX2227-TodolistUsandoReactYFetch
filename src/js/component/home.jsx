@@ -1,90 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
+const home = () => {
+    const [inputValue, setInputValue] = useState("pedro");
+    const [list, setList] = useState([]);
+    const [newTask, setNewTask] = useState("");
 
-const Home = () => {
-  const [tarea, setTareas] = useState([]);
+    const getList = async () => {
+        try {
+            const response = await fetch(
+                `https://playground.4geeks.com/apis/fake/todos/user/${inputValue}`
+            );
+            if (!response.ok) {
+                throw new Error("El response get dio false ");
+            }
+            const data = await response.json();
+            setList(data);
+        } catch (err) { 
+            console.log(err)
+        }
+    };
+    const handlerClick = async () => {
+        try {
+            if (newTask) {
+                let obj = {
+                    label: newTask,
+                    done: false, 
+                }
+                setList([...list, obj])
+                const response = await fetch(`https://playground.4geeks.com/apis/fake/todos/user/${inputValue}`, {
+                    body: JSON.stringify(list),
+                    METHOD: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json'                   }
+                })
+                if (!response.ok) {
+                    throw new Error("El response get dio false ");
+                }
+                const data = await response.json()
+                console.log(data)
+                
+            }else {
+                alert("Para guardar tarea debes escribir algo!")
+            }
 
-  const [inputValue, setInputValue] = useState("");
+            
+        } catch(err){
 
-  const handleAddTask = () => {
-    if (inputValue.trim() !== "") {
-      const miObj = {
-        label: inputValue,
-        done: false,
-      };
-      setTareas([...tarea, miObj]);
-
-      setInputValue("");
+        }
     }
-  };
+    useEffect(() => {
+        getList();
+    }, [inputValue]);
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
-  };
-
-  const handleDeleteTask = (index) => {
-    const newTasks = tarea.filter((_, i) => i !== index);
-    setTareas(newTasks);
-  };
-
-  return (
-    <div>
-      <div className="container mt-5 border border-light-subtle rounded">
-        <div className="row justify-content-center">
-          <div className="col-lg-6 col-md-8 col-sm-10">
-            <h1 className="text-center mb-5">Todo List</h1>
-
-            <div className="form-group p-3 text-center">
-              <input
-                className="form-control mb-3"
-                type="text"
-                id="todo-input"
-                value={inputValue}
-                onChange={handleInputChange}
-                name="text"
-                autoComplete="off"
-                placeholder="Ingresar una tarea"
-              />
-              <button
-                className="btn btn-success rounded-pill "
-                type="button"
-                onClick={handleAddTask}
-              >
-                Agregar Tarea
-              </button>
-            </div>
-          </div>
+    return (
+        <div className="text-center container">
+            <h3>Busca tu lista por nombre: </h3>
+            <input type="text" onChange={(e) => setInputValue(e.target.value)} />
+            <h3>Agregar nueva tarea: </h3>
+            <input type="text"  onChange={(e) => setNewTask(e.target.value)}/>
+            <button onClick={ handlerClick }>Agregar Tarea</button>
+            <ul className="list-group list-group-flush">
+                {
+                    list.map((ele, index)=> {
+                        return <li className="list-group-item" key={index}> {ele.label} </li>
+                    })
+                }                
+            </ul>
         </div>
-      </div>
-
-      <div className="container mt-5">
-        <div className="row mx-auto" style={{ width: "640px" }}>
-          <ul className="list-group">
-            {tarea.length === 0 ? (
-              <li className="list-group-item text-center">
-                No hay tareas, añadir tareas
-              </li>
-            ) : (
-              tarea.map((elem, index) => (
-                <li
-                  className="list-group-item d-flex justify-content-between align-items-center"
-                  key={index}
-                >
-                  {elem.label}
-                  <button
-                    className="btn btn-outline-danger btn-md"
-                    onClick={() => handleDeleteTask(index)}
-                  >
-                    
-                  </button>
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
-export default Home;
+export default home;
