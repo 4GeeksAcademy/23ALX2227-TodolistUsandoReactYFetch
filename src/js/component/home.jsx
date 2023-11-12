@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 
 const home = () => {
-    const [inputValue, setInputValue] = useState("pedro");
+    const [inputValue, setInputValue] = useState("");
     const [list, setList] = useState([]);
     const [newTask, setNewTask] = useState("");
+    const [newUserValue, setNewUserValue] = useState("");
 
     const getList = async () => {
         try {
@@ -29,12 +30,12 @@ const home = () => {
                 setList([...list, obj])
                 const response = await fetch(`https://playground.4geeks.com/apis/fake/todos/user/${inputValue}`, {
                     body: JSON.stringify(list),
-                    METHOD: "PUT",
+                    method: "PUT",
                     headers: {
                         'Content-Type': 'application/json'                   }
                 })
                 if (!response.ok) {
-                    throw new Error("El response get dio false ");
+                    throw new Error("No se pudo actulizar la lista");
                 }
                 const data = await response.json()
                 console.log(data)
@@ -44,6 +45,25 @@ const home = () => {
             }
 
             
+        } catch(err){
+            console.log(err)
+
+        }
+    }
+    const handlerNewUser = async () => {
+        try { 
+            const response = await fetch(`https://playground.4geeks.com/apis/fake/todos/user/${newUserValue}`, {
+                body: JSON.stringify([]),
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'                   }
+            }
+            )
+            const data = await response.json()
+            console.log(data)
+
+
+
         } catch(err){
 
         }
@@ -55,14 +75,18 @@ const home = () => {
     return (
         <div className="text-center container">
             <h3>Busca tu lista por nombre: </h3>
-            <input type="text" onChange={(e) => setInputValue(e.target.value)} />
+            <input type="text" className="form-control" onChange={(e) => setInputValue(e.target.value)} />
+            <h3>Crear usurio:</h3>            
+            <input type="text" className="form-control" onChange={(e) => setNewUserValue(e.target.value)} />
+            <button className="btn btn-success mt-3" onClick={ handlerNewUser }>New User</button>
             <h3>Agregar nueva tarea: </h3>
-            <input type="text"  onChange={(e) => setNewTask(e.target.value)}/>
-            <button onClick={ handlerClick }>Agregar Tarea</button>
-            <ul className="list-group list-group-flush">
+            <input type="text" className="form-control" onChange={(e) => setNewTask(e.target.value)}/>
+            <button className="btn btn-primary mt-3" onClick={ handlerClick }>Agregar Tarea</button>
+            <ul className="list-group">
                 {
                     list.map((ele, index)=> {
-                        return <li className="list-group-item" key={index}> {ele.label} </li>
+                        return <li className="list-group-item list-group-item-success mt-4" key={index}> {ele.label} </li>
+                        
                     })
                 }                
             </ul>
