@@ -70,10 +70,18 @@ const home = () => {
 
     const handlerDelete = async () => {
         try {
+            const response = await fetch(`https://playground.4geeks.com/apis/fake/todos/user/${newUserValue}`, {
+                method: "DELETE",
+                headers: { "conten-type" : "aplication/json" }
+            }
+            )
+            const data = await response.json()
+            console.log(data)
             
-        }
+        } catch{err}
 
     }
+
 
     useEffect(() => {
         getList();
